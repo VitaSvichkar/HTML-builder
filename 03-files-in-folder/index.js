@@ -4,6 +4,7 @@ fs.readdir(
   '03-files-in-folder/secret-folder',
   // { withFileTypes: true },
   (err, data) => {
+    // console.log(data);
     if (err) throw err;
     data.forEach((elem) => {
       // console.log(elem);
