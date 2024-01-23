@@ -23,7 +23,9 @@ const urlFilesCopy = '04-copy-directory/files-copy/';
 
 async function clearAndCopyFiles(folder, copyFolder) {
   try {
-    await fs.rmdir(copyFolder, { recursive: true });
+    try {
+      await fs.rm(copyFolder, { recursive: true });
+    } catch (err) {}
 
     await fs.mkdir(copyFolder, { recursive: true });
 
