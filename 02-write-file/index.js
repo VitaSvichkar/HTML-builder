@@ -11,8 +11,13 @@ fs.writeFile(path.join(__dirname, '02-write-file.txt'), '', (err) => {
   stdout.write('hello, write something\n');
 
   stdin.on('data', (data) => {
-    text += data;
+    const textData = data.toString().trim();
+    text += textData;
 
+    if (textData.toLowerCase() === 'exit') {
+      console.log('goodbye');
+      process.exit();
+    }
     fs.writeFile('02-write-file/02-write-file.txt', text, (err) => {
       if (err) throw err;
     });
