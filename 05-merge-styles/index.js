@@ -1,37 +1,53 @@
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 
-const urlStyles = path.join(__dirname, 'styles');
-const urlMergeStyle = path.join(__dirname, 'project-dist');
-
-async function clearAndMergeFile(folderStyles, folderCopyStyles) {
-  try {
-    const filePath = path.join(folderCopyStyles, 'bundle.css');
-    try {
-      await fs.unlink(filePath);
-    } catch (err) {}
-    const files = await fs.readdir(folderStyles);
-    const arrFiles = [];
-
-    for (const file of files) {
-      const urlFile = path.join(folderStyles, file);
-      const extension = path.extname(urlFile);
-      const stats = await fs.stat(urlFile);
-      // let reading;
-
-      if (stats.isFile() && extension === '.css') {
-        const reading = await fs.readFile(urlFile, {
-          encoding: 'utf8',
-        });
-        arrFiles.push(reading);
-      }
+fs.readdir(
+  path.join(__dirname, 'styles'),
+  { withFileTypes: true },
+  (err, data) => {
+    if (err) {
+      console.log(err);
+      return;
     }
-    await fs.writeFile(filePath, arrFiles.join('\n'), {
-      encoding: 'utf8',
-      flag: 'w',
-    });
-  } catch (err) {
-    console.log(err);
-  }
-}
-clearAndMergeFile(urlStyles, urlMergeStyle);
+
+    fs.writeFile(
+      path.join(__dirname, 'project-dist', 'bundle.css'),
+      '',
+      (err) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+
+        data.forEach((item) => {
+          if (item.isFile()) {
+            if (path.extname(item.name) === '.css') {
+              fs.readFile(
+                path.join(__dirname, 'styles', item.name),
+                'utf-8',
+                (err, data) => {
+                  if (err) {
+                    console.log(err);
+                    return;
+                  }
+
+                  fs.appendFile(
+                    path.join(__dirname, 'project-dist', 'bundle.css'),
+                    data,
+                    (err) => {
+                      if (err) {
+                        console.log(err);
+                        return;
+                      }
+                      console.log('File ' + item.name + ' is copied');
+                    },
+                  );
+                },
+              );
+            }
+          }
+        });
+      },
+    );
+  },
+);
